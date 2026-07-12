@@ -1,0 +1,13 @@
+#!/bin/sh
+# Apktool launcher — POSIX sh port of the upstream wrapper script
+# (upstream ships a bash wrapper; this image intentionally has no bash).
+#
+# The default JVM flags mirror the upstream wrapper. Override them by setting
+# APKTOOL_JAVA_OPTS, e.g.:
+#   docker run -e APKTOOL_JAVA_OPTS="-Xmx4G -Dfile.encoding=utf-8" \
+#     ragedunicorn/apktool:latest d big.apk
+: "${APKTOOL_JAVA_OPTS:=-Xmx1024M -Dfile.encoding=utf-8 -Djdk.util.zip.disableZip64ExtraFieldValidation=true -Djdk.nio.zipfs.allowDotZipEntry=true}"
+
+# Word splitting of APKTOOL_JAVA_OPTS is intentional: it carries multiple flags.
+# shellcheck disable=SC2086
+exec java $APKTOOL_JAVA_OPTS -jar /usr/local/bin/apktool.jar "$@"

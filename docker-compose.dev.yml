@@ -1,0 +1,34 @@
+# Docker Compose configuration for development
+#
+# This file is used for building and testing the Apktool image locally
+#
+# Usage:
+#   docker-compose -f docker-compose.dev.yml build
+#   docker-compose -f docker-compose.dev.yml run --rm apktool-dev
+#
+# This will drop you into a shell where you can manually run apktool commands
+
+services:
+  apktool-dev:
+    build: .
+    image: ragedunicorn/apktool:dev
+    volumes:
+      - ./workspace:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+    # Override entrypoint to get a shell
+    entrypoint: /bin/sh
+    labels:
+      org.opencontainers.image.title: "Apktool on Alpine Linux (Dev)"
+      org.opencontainers.image.description: "Apktool development environment for testing and debugging"
+      org.opencontainers.image.vendor: "ragedunicorn"
+    environment:
+      - TERM=xterm-256color
+      - PS1=\[\033[1;36m\]apktool-dev\[\033[0m\]:\w\$
+    # Resource limits for development (optional)
+    # deploy:
+    #   resources:
+    #     limits:
+    #       cpus: '4'
+    #       memory: 4G

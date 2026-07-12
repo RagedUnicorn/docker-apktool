@@ -1,0 +1,13 @@
+* text=auto
+
+.dockerignore text eol=lf
+Dockerfile text eol=lf
+docker-compose.yml text eol=lf
+docker-compose.*.yml text eol=lf
+
+*.sh text eol=lf
+# Extensionless POSIX wrapper copied into the image — must stay LF
+scripts/apktool text eol=lf
+
+# Binary APK sample must never be eol-normalized
+*.apk binary

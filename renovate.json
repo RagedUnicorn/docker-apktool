@@ -1,0 +1,140 @@
+{
+  "$schema": "https://docs.renovatebot.com/renovate-schema.json",
+  "description": "ignorePaths intentionally overrides the :ignoreModulesAndTests preset from config:recommended: test/ must stay visible so the metadata-test custom manager can update test/apktool_metadata_test.yml",
+  "extends": [
+    "config:recommended"
+  ],
+  "schedule": [
+    "on monday"
+  ],
+  "timezone": "UTC",
+  "labels": [
+    "dependencies",
+    "renovate"
+  ],
+  "ignorePaths": [
+    "docker-compose.yml",
+    "docker-compose.dev.yml",
+    "docker-compose.test.yml",
+    "examples/**"
+  ],
+  "packageRules": [
+    {
+      "matchCategories": [
+        "docker"
+      ],
+      "enabled": true,
+      "pinDigests": false
+    },
+    {
+      "description": "Automatically merge minor and patch updates for Alpine",
+      "matchDatasources": [
+        "docker"
+      ],
+      "matchPackageNames": [
+        "alpine"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true
+    },
+    {
+      "description": "Group every Alpine reference (FROM, base.name label, metadata test) into one PR",
+      "matchPackageNames": [
+        "alpine"
+      ],
+      "groupName": "alpine",
+      "groupSlug": "alpine"
+    },
+    {
+      "description": "Strip the leading 'v' from Apktool GitHub release tags. No automerge: upstream ships no checksums, so APKTOOL_SHA256 in the Dockerfile must be updated by hand before the PR can build",
+      "matchDatasources": [
+        "github-releases"
+      ],
+      "matchPackageNames": [
+        "iBotPeaches/Apktool"
+      ],
+      "extractVersion": "^v(?<version>.*)$",
+      "prBodyNotes": [
+        "⚠️ `APKTOOL_SHA256` in the Dockerfile must be updated manually for this version — upstream publishes no checksums, so the build fails checksum verification until the hash is refreshed. See DEVELOPMENT.md → 'Updating Apktool'."
+      ]
+    },
+    {
+      "description": "Temurin 21 apk pin: versions come from the Artifactory directory listing; extractVersion filters the hrefs down to temurin-21-jre-*.apk",
+      "matchDatasources": [
+        "custom.adoptium-apk"
+      ],
+      "extractVersion": "^temurin-21-jre-(?<version>.+)\\.apk$",
+      "groupName": "temurin",
+      "groupSlug": "temurin"
+    },
+    {
+      "description": "Automatically merge minor and patch updates for Temurin (quarterly CPU patches; old pins stay installable in the Adoptium index, so a bad automerge is trivially revertible)",
+      "matchDatasources": [
+        "custom.adoptium-apk"
+      ],
+      "matchUpdateTypes": [
+        "minor",
+        "patch"
+      ],
+      "automerge": true
+    }
+  ],
+  "customDatasources": {
+    "adoptium-apk": {
+      "defaultRegistryUrlTemplate": "https://packages.adoptium.net/artifactory/apk/alpine/main/x86_64/",
+      "format": "html"
+    }
+  },
+  "customManagers": [
+    {
+      "customType": "regex",
+      "description": "Update versions pinned via renovate comments before ARG lines in the Dockerfile",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "matchStrings": [
+        "# renovate: datasource=(?<datasource>.*?) depName=(?<depName>.*?)(?: versioning=(?<versioning>.*?))?\\s+ARG .*?=(?<currentValue>.*)"
+      ],
+      "versioningTemplate": "{{#if versioning}}{{{versioning}}}{{else}}semver{{/if}}"
+    },
+    {
+      "customType": "regex",
+      "description": "Keep the Alpine base.name OCI label in the Dockerfile in sync with the FROM version",
+      "managerFilePatterns": [
+        "/^Dockerfile$/"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "alpine",
+      "versioningTemplate": "docker",
+      "matchStrings": [
+        "image\\.base\\.name=\"docker\\.io/library/alpine:(?<currentValue>[^\"]+)\""
+      ]
+    },
+    {
+      "customType": "regex",
+      "description": "Keep the Alpine version in the metadata test in sync with the FROM version",
+      "managerFilePatterns": [
+        "/^test/apktool_metadata_test\\.yml$/"
+      ],
+      "datasourceTemplate": "docker",
+      "depNameTemplate": "alpine",
+      "versioningTemplate": "docker",
+      "matchStrings": [
+        "docker\\.io/library/alpine:(?<currentValue>[^']+)'"
+      ]
+    }
+  ],
+  "commitMessagePrefix": "chore(deps):",
+  "commitMessageAction": "update",
+  "commitMessageTopic": "{{depName}}",
+  "commitMessageExtra": "to {{newVersion}}",
+  "prConcurrentLimit": 5,
+  "prHourlyLimit": 2,
+  "rebaseWhen": "behind-base-branch",
+  "assignees": [
+    "ragedunicorn"
+  ]
+}

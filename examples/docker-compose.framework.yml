@@ -1,0 +1,41 @@
+# Docker Compose configuration for working with framework files
+#
+# Some vendor APKs (Samsung, HTC, ...) depend on framework resources that
+# Apktool must know about. Frameworks installed with `apktool if` normally
+# land in the container's home directory and are lost when the container
+# exits. These examples use --frame-path (-p) to keep the framework files in
+# ./workspace/framework/ instead, so they persist across runs.
+#
+# Usage examples:
+#   1. Copy the vendor framework APK (e.g. framework-res.apk pulled from the
+#      device) into ./workspace/input/
+#   2. docker compose -f examples/docker-compose.framework.yml run --rm install-framework
+#   3. APK_FILE=vendor-app.apk docker compose -f examples/docker-compose.framework.yml run --rm decode-with-framework
+#
+# No framework APK is bundled — vendor frameworks must be supplied by you.
+
+services:
+  # Base service configuration (inherited by other services)
+  apktool-base:
+    image: ragedunicorn/apktool:${APKTOOL_VERSION:-latest}
+    volumes:
+      - ../workspace:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+  # Install a framework APK into the persistent framework directory
+  install-framework:
+    extends:
+      service: apktool-base
+    command: >
+      if input/${FRAMEWORK_FILE:-framework-res.apk}
+      -p framework
+
+  # Decode an APK against the persistent framework directory
+  decode-with-framework:
+    extends:
+      service: apktool-base
+    command: >
+      d -f -p framework input/${APK_FILE:-hello.apk}
+      -o output/decoded-fw

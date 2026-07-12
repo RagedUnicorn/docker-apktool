@@ -1,0 +1,29 @@
+# Docker Compose configuration for rebuilding decoded APK projects
+#
+# Usage examples:
+#   docker compose -f examples/docker-compose.build.yml run --rm build-apk
+#
+# Rebuilds the project decoded by the decode example (run that one first).
+# The rebuilt APK is unsigned — sign it with apksigner or a similar tool
+# before installing it on a device.
+#
+# NOTE: rebuilding uses the aapt2 binary bundled with Apktool and only works
+# on amd64 hosts (see README, Architecture Support).
+
+services:
+  # Base service configuration (inherited by other services)
+  apktool-base:
+    image: ragedunicorn/apktool:${APKTOOL_VERSION:-latest}
+    volumes:
+      - ../workspace:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+  # Rebuild a decoded project into an APK
+  build-apk:
+    extends:
+      service: apktool-base
+    command: >
+      b output/decoded
+      -o output/rebuilt.apk

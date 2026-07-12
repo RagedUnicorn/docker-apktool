@@ -1,0 +1,55 @@
+schemaVersion: 2.0.0
+
+commandTests:
+  # apktool --version prints the bare version (e.g. 3.0.2) on stdout. Pinned
+  # to the minor version so Apktool patch bumps via Renovate stay green (same
+  # looseness as the version checks in the other family repos).
+  - name: 'Apktool version check'
+    command: 'apktool'
+    args: ['--version']
+    expectedOutput: ['3.0']
+    exitCode: 0
+
+  - name: 'Apktool wrapper resolves on PATH'
+    command: 'which'
+    args: ['apktool']
+    expectedOutput: ['/usr/local/bin/apktool']
+    exitCode: 0
+
+  # java -version writes to stderr, hence expectedError
+  - name: 'Java runtime version check'
+    command: 'java'
+    args: ['-version']
+    expectedError:
+      - 'openjdk version "21'
+      - 'Temurin'
+    exitCode: 0
+
+  - name: 'Non-root user exists'
+    command: 'id'
+    args: ['apktool']
+    expectedOutput:
+      - 'uid='
+      - 'apktool'
+    exitCode: 0
+
+  - name: 'Check working directory'
+    command: 'pwd'
+    args: []
+    expectedOutput: ['/workspace']
+    exitCode: 0
+
+  # Runs as the image's default user (apktool), so this also proves the
+  # /workspace chown made the working directory writable
+  - name: 'Working directory is writable'
+    command: 'sh'
+    args: ['-c', 'touch /workspace/.write-test && rm /workspace/.write-test']
+    exitCode: 0
+
+  # Apktool aborts (even on decode) if it cannot write the framework
+  # directory, so writability is load-bearing. Absolute path instead of $HOME:
+  # container-structure-test does not populate HOME when running commands.
+  - name: 'Framework directory is writable'
+    command: 'sh'
+    args: ['-c', 'touch /home/apktool/.local/share/apktool/framework/.write-test && rm /home/apktool/.local/share/apktool/framework/.write-test']
+    exitCode: 0

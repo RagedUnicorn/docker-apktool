@@ -1,0 +1,23 @@
+# Environment files
+.env.local
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# Workspace files (local working directory) — ignored except the bundled sample APK
+workspace/*
+!workspace/input/
+workspace/input/*
+!workspace/input/hello.apk
+
+# Temporary files
+*.tmp
+*.log
+
+# IDE files
+.vscode/
+.idea/
+*.swp
+*.swo
+*~

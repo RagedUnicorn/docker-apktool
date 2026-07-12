@@ -1,0 +1,36 @@
+# Docker Compose configuration for common APK decoding tasks
+#
+# Usage examples:
+#   docker compose -f examples/docker-compose.decode.yml run --rm decode-apk
+#   docker compose -f examples/docker-compose.decode.yml run --rm decode-no-sources
+#
+# Place your input APKs in ./workspace/input/ (a sample hello.apk is bundled).
+# Decoded projects are written to ./workspace/output/
+# Set APK_FILE to decode a different file:
+#   APK_FILE=my.apk docker compose -f examples/docker-compose.decode.yml run --rm decode-apk
+
+services:
+  # Base service configuration (inherited by other services)
+  apktool-base:
+    image: ragedunicorn/apktool:${APKTOOL_VERSION:-latest}
+    volumes:
+      - ../workspace:/workspace
+    working_dir: /workspace
+    stdin_open: true
+    tty: true
+
+  # Decode an APK (resources and sources)
+  decode-apk:
+    extends:
+      service: apktool-base
+    command: >
+      d -f input/${APK_FILE:-hello.apk}
+      -o output/decoded
+
+  # Decode resources only, skip disassembling code (faster)
+  decode-no-sources:
+    extends:
+      service: apktool-base
+    command: >
+      d -f -s input/${APK_FILE:-hello.apk}
+      -o output/decoded-no-sources
