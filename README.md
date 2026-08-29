@@ -1,6 +1,6 @@
 # docker-apktool
 
-![](./docs/docker_apktool.png)
+![](./docs/docker_apktool_banner.svg)
 
 [![Release Build](https://github.com/RagedUnicorn/docker-apktool/actions/workflows/docker_release.yml/badge.svg)](https://github.com/RagedUnicorn/docker-apktool/actions/workflows/docker_release.yml)
 [![Test](https://github.com/RagedUnicorn/docker-apktool/actions/workflows/test.yml/badge.svg)](https://github.com/RagedUnicorn/docker-apktool/actions/workflows/test.yml)
