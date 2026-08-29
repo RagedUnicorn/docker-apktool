@@ -1,5 +1,7 @@
 # Apktool Alpine Docker Image
 
+![Docker Apktool](https://raw.githubusercontent.com/RagedUnicorn/docker-apktool/master/docs/docker_apktool_banner.png)
+
 A lightweight [Apktool](https://apktool.org/) installation on Alpine Linux with an Eclipse Temurin 21 JRE, for
 decoding and rebuilding Android APKs.
 
