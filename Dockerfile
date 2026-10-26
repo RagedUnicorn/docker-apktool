@@ -4,7 +4,7 @@
 FROM alpine:3.24.3 AS build
 
 # renovate: datasource=github-releases depName=iBotPeaches/Apktool
-ARG APKTOOL_VERSION=3.0.2
+ARG APKTOOL_VERSION=3.0.3
 # Upstream publishes no checksums for its release assets, so this SHA-256 is
 # self-pinned: computed from the downloaded jar and updated by hand whenever
 # APKTOOL_VERSION changes. Renovate bumps only the version ARG above; the
