@@ -35,7 +35,7 @@ RUN set -eux; \
 FROM alpine:3.24.3
 
 # renovate: datasource=custom.adoptium-apk depName=temurin-21-jre versioning=loose
-ARG TEMURIN_VERSION=21.0.12.1_p1-r0
+ARG TEMURIN_VERSION=21.0.13_p9-r0
 ARG BUILD_DATE
 ARG VERSION
 
