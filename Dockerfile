@@ -10,7 +10,7 @@ ARG APKTOOL_VERSION=3.0.3
 # APKTOOL_VERSION changes. Renovate bumps only the version ARG above; the
 # build then fails checksum verification until this hash is refreshed.
 # See DEVELOPMENT.md ("Updating Apktool") for the procedure.
-ARG APKTOOL_SHA256=eee4669a704a14e0623407e6701b0b91887e61e1e4049cb7a82833e14ae8b5fd
+ARG APKTOOL_SHA256=dbf930b076c6b9be08d57c449cacefc3bdd6b71ebd59b3066fc0e1f5b14f9423
 
 # Build stage labels
 LABEL org.opencontainers.image.authors="Michael Wiesendanger <michael.wiesendanger@gmail.com>" \
