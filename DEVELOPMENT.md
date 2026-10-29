@@ -96,30 +96,30 @@ docker build -t ragedunicorn/apktool:test .
 
 ```bash
 # Run all tests against your local build
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml run test-all
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 
 # Run specific tests during development
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
 ```
 
 **Windows Command Prompt:**
 
 ```cmd
 # Run all tests against your local build
-set APKTOOL_VERSION=test && docker compose -f docker-compose.test.yml run test-all
+set APKTOOL_TEST_VERSION=test && docker compose -f docker-compose.test.yml run test-all
 
 # Run specific tests during development
-set APKTOOL_VERSION=test && docker compose -f docker-compose.test.yml up container-test-command
+set APKTOOL_TEST_VERSION=test && docker compose -f docker-compose.test.yml up container-test-command
 ```
 
 **Windows PowerShell:**
 
 ```powershell
 # Run all tests against your local build
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 
 # Run specific tests during development
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
 ```
 
 **Important:** Never test against remote images - they may have different labels or configurations due to CI/CD overrides.

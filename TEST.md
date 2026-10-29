@@ -107,21 +107,21 @@ docker build -t ragedunicorn/apktool:test .
 
 ```bash
 # Run tests against your local build
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml run test-all
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # Run tests against your local build
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Windows (Command Prompt):**
 
 ```cmd
 # Run tests against your local build
-set APKTOOL_VERSION=test && docker compose -f docker-compose.test.yml run test-all
+set APKTOOL_TEST_VERSION=test && docker compose -f docker-compose.test.yml run test-all
 ```
 
 **Why local testing is important:**
@@ -130,17 +130,13 @@ set APKTOOL_VERSION=test && docker compose -f docker-compose.test.yml run test-a
 - Avoids false positives/negatives from version mismatches
 - Guarantees consistent test results
 
-**Note:** the repository `.env` file sets `APKTOOL_VERSION=latest` for regular compose usage. Docker Compose loads it
-automatically, so the `test` fallback in `docker-compose.test.yml` never applies — always set `APKTOOL_VERSION=test`
-explicitly when running the test suites (the `.run` configurations do this for you).
-
 **Never pull remote images for testing:**
 
 **❌ DON'T DO THIS - may have different labels/settings:**
 
 ```bash
 docker pull ragedunicorn/apktool:latest
-docker compose -f docker-compose.test.yml run test-all
+APKTOOL_TEST_VERSION=latest docker compose -f docker-compose.test.yml run test-all
 ```
 
 **✅ DO THIS - test your local build:**
@@ -149,15 +145,21 @@ Linux/macOS:
 
 ```bash
 docker build -t ragedunicorn/apktool:test .
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml run test-all
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml run test-all
 ```
 
 Windows (PowerShell):
 
 ```powershell
 docker build -t ragedunicorn/apktool:test .
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml run test-all
 ```
+
+### Why `APKTOOL_TEST_VERSION` and not `APKTOOL_VERSION`
+
+`docker-compose.test.yml` reads its own variable, `APKTOOL_TEST_VERSION`, which defaults to `test`. The runtime compose file and the examples read `APKTOOL_VERSION`, which `.env` pins to `latest`.
+
+Keeping them separate matters. If both files read the same variable, the `latest` value in `.env` silently wins over the `:-test` fallback in the test compose file, and a bare `docker compose -f docker-compose.test.yml run test-all` quietly validates the **published** image instead of the one you just built - exactly the failure mode this document warns about. With two variables, the bare command always tests the local build.
 
 ### Test Execution
 
@@ -167,26 +169,26 @@ Run specific test categories:
 
 ```bash
 # File structure tests
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml up container-test
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test
 
 # Command execution tests
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test-command
 
 # Metadata and label tests
-APKTOOL_VERSION=test docker compose -f docker-compose.test.yml up container-test-metadata
+APKTOOL_TEST_VERSION=test docker compose -f docker-compose.test.yml up container-test-metadata
 ```
 
 **Windows (PowerShell):**
 
 ```powershell
 # File structure tests
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml up container-test
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test
 
 # Command execution tests
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-command
 
 # Metadata and label tests
-$env:APKTOOL_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-metadata
+$env:APKTOOL_TEST_VERSION="test"; docker compose -f docker-compose.test.yml up container-test-metadata
 ```
 
 ### Running the Round Trip Locally
@@ -217,7 +219,7 @@ See the debugging section in [DEVELOPMENT.md](DEVELOPMENT.md) for commands to ex
 
 1. **Testing remote images instead of local builds**
    - Remote images (Docker Hub, GHCR) have labels overridden by CI/CD
-   - Always test your local builds with `APKTOOL_VERSION=test`
+   - Always test your local builds with `APKTOOL_TEST_VERSION=test`
 
 2. **Label value mismatches**
    - CI/CD systems may capitalize values (e.g., "RagedUnicorn" vs "ragedunicorn")
@@ -291,7 +293,7 @@ Manual integration example:
 ```yaml
 - name: Run Container Structure Tests
   env:
-    APKTOOL_VERSION: test
+    APKTOOL_TEST_VERSION: test
   run: docker compose -f docker-compose.test.yml run test-all
 ```
 
