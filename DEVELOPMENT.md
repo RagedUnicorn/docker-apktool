@@ -67,19 +67,27 @@ The development mode:
 # Basic build
 docker build -t ragedunicorn/apktool:dev .
 
-# Build with specific versions
+# Build with version metadata (Apktool and Alpine come from the Dockerfile)
 docker build \
-  --build-arg APKTOOL_VERSION=3.0.2 \
-  --build-arg APKTOOL_SHA256=eee4669a704a14e0623407e6701b0b91887e61e1e4049cb7a82833e14ae8b5fd \
   --build-arg BUILD_DATE=$(date -u +'%Y-%m-%dT%H:%M:%SZ') \
-  --build-arg VERSION=3.0.2-alpine3.24.1-1 \
-  -t ragedunicorn/apktool:3.0.2-alpine3.24.1-1 .
+  --build-arg VERSION=dev \
+  -t ragedunicorn/apktool:dev .
+
+# Build a different Apktool version than the Dockerfile default
+# (the jar checksum must match that version, see "Updating Apktool")
+docker build \
+  --build-arg APKTOOL_VERSION=<apktool-version> \
+  --build-arg APKTOOL_SHA256=<apktool-sha256> \
+  -t ragedunicorn/apktool:dev .
 
 # Multi-platform build (requires buildx)
 docker buildx build \
   --platform linux/amd64,linux/arm64 \
   -t ragedunicorn/apktool:dev .
 ```
+
+The Apktool version is the `APKTOOL_VERSION` default in the `Dockerfile` and the Alpine version is its `FROM` line.
+Renovate keeps both current, so the docs do not repeat them.
 
 ### 3. Testing Your Changes
 
@@ -135,8 +143,8 @@ version:
 
 ```dockerfile
 # renovate: datasource=github-releases depName=iBotPeaches/Apktool
-ARG APKTOOL_VERSION=3.0.2
-ARG APKTOOL_SHA256=eee4669a704a14e0623407e6701b0b91887e61e1e4049cb7a82833e14ae8b5fd
+ARG APKTOOL_VERSION=<apktool-version>
+ARG APKTOOL_SHA256=<apktool-sha256>
 ```
 
 Renovate bumps only `APKTOOL_VERSION`; the build then fails checksum verification until the hash is refreshed. On an

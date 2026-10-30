@@ -11,8 +11,8 @@ decoding and rebuilding Android APKs.
 # Pull latest version
 docker pull ragedunicorn/apktool:latest
 
-# Or pull specific version
-docker pull ragedunicorn/apktool:3.0.2-alpine3.24.1-1
+# Or pull specific version (see the Tags tab for the available versions)
+docker pull ragedunicorn/apktool:<apktool-version>-alpine<alpine-version>-<build>
 
 # Decode an APK
 docker run -v $(pwd):/workspace ragedunicorn/apktool:latest d app.apk -o app
@@ -66,10 +66,16 @@ This image uses semantic versioning that includes all component versions:
 
 ### Version Examples
 
-- `3.0.2-alpine3.24.1-1` - Initial release with Apktool 3.0.2 and Alpine 3.24.1
-- `3.0.2-alpine3.24.1-2` - Rebuild of same versions (bug fixes, security patches)
-- `3.0.2-alpine3.24.2-1` - Alpine Linux patch update
-- `3.0.3-alpine3.24.1-1` - Apktool version update
+`X.Y.Z` is the Apktool version, `A.B.C` the Alpine version:
+
+- `X.Y.Z-alpineA.B.C-1` - Apktool X.Y.Z on Alpine A.B.C, first build
+- `X.Y.Z-alpineA.B.C-2` - Rebuild of same versions (bug fixes, security patches)
+- `X.Y.Z-alpineA.B.D-1` - Alpine Linux patch update
+- `X.Y+1.0-alpineA.B.C-1` - Apktool version update
+- `X.Y.Z` - Most recent build of Apktool X.Y.Z
+- `latest` - Most recent stable release
+
+The available versions are listed in the [Tags tab](https://hub.docker.com/r/ragedunicorn/apktool/tags).
 
 When updates are available through automated dependency management, new releases are created with appropriate version tags.
 

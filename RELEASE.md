@@ -6,8 +6,10 @@ This document describes how to create a new release for the Docker Apktool proje
 
 ```bash
 # Tag format: v{apktool_version}-alpine{alpine_version}-{build_number}
-git tag -a v3.0.2-alpine3.24.1-1 -m "v3.0.2-alpine3.24.1-1"
-git push origin v3.0.2-alpine3.24.1-1
+# Take the versions from the Dockerfile (APKTOOL_VERSION and the FROM line)
+TAG=v<apktool-version>-alpine<alpine-version>-<build>
+git tag -a "$TAG" -m "$TAG"
+git push origin "$TAG"
 ```
 
 This automatically triggers the release process via GitHub Actions.
@@ -18,11 +20,11 @@ See [README.md](README.md#versioning) for the complete versioning documentation.
 
 **Format:** `v{apktool_version}-alpine{alpine_version}-{build_number}`
 
-Examples:
-- `v3.0.2-alpine3.24.1-1` - Initial release
-- `v3.0.2-alpine3.24.1-2` - Rebuild with same versions
-- `v3.0.2-alpine3.24.2-1` - Alpine update (build resets to 1)
-- `v3.0.3-alpine3.24.1-1` - Apktool update (build resets to 1)
+Examples (`X.Y.Z` is the Apktool version, `A.B.C` the Alpine version):
+- `vX.Y.Z-alpineA.B.C-1` - Initial release
+- `vX.Y.Z-alpineA.B.C-2` - Rebuild with same versions
+- `vX.Y.Z-alpineA.B.D-1` - Alpine update (build resets to 1)
+- `vX.Y+1.0-alpineA.B.C-1` - Apktool update (build resets to 1)
 
 ## Release Workflow
 
@@ -58,15 +60,17 @@ Create a new release when:
 
 ### Update Docker Hub Documentation
 
-After creating a release, manually update the Docker Hub repository description:
+`DOCKERHUB.md` is the source of truth for the Docker Hub repository description. It deliberately contains no concrete
+versions (readers find those in the Tags tab), so a release alone does not require a description update. Only when
+`DOCKERHUB.md` changed since the last sync:
 
 1. Go to [Docker Hub](https://hub.docker.com/r/ragedunicorn/apktool)
 2. Click "Manage Repository" → "Description"
 3. Copy the contents of `DOCKERHUB.md`
-4. Update any version numbers in the examples to match the latest release
-5. Save the changes
+4. Save the changes
 
-**Note**: The `DOCKERHUB.md` file is maintained in the repository as the source of truth for Docker Hub documentation.
+**Note**: the sync stays manual on purpose. Docker Hub only offers an undocumented endpoint for description updates, and
+it needs a separate Read/Write/Delete access token.
 
 ## Best Practices
 
@@ -101,7 +105,7 @@ Before creating a release:
 
 ### Release didn't trigger
 
-- Ensure tag starts with `v` and follows the format (e.g., `v3.0.2-alpine3.24.1-1`)
+- Ensure tag starts with `v` and follows the format (e.g., `vX.Y.Z-alpineA.B.C-N`)
 - Check GitHub Actions tab for workflow runs
 - Verify you have push permissions
 
@@ -141,10 +145,10 @@ If automation fails, you can create a release manually:
 
 1. Go to repository's "Releases" page
 2. Click "Create a new release"
-3. Choose your tag (must follow format: `v3.0.2-alpine3.24.1-1`)
+3. Choose your tag (must follow format: `vX.Y.Z-alpineA.B.C-N`)
 4. Add release notes
-5. Include Docker pull commands:
+5. Include Docker pull commands (the tag without the leading `v`):
    ```
-   docker pull ghcr.io/ragedunicorn/docker-apktool:3.0.2-alpine3.24.1-1
-   docker pull ragedunicorn/apktool:3.0.2-alpine3.24.1-1
+   docker pull ghcr.io/ragedunicorn/docker-apktool:<tag>
+   docker pull ragedunicorn/apktool:<tag>
    ```

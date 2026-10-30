@@ -51,10 +51,10 @@ be passed directly to the `docker run` command. Running the image without argume
 docker run -v $(pwd):/workspace ragedunicorn/apktool:latest [apktool-options]
 
 # Using specific Apktool version (latest Alpine build)
-docker run -v $(pwd):/workspace ragedunicorn/apktool:3.0.2 [apktool-options]
+docker run -v $(pwd):/workspace ragedunicorn/apktool:<apktool-version> [apktool-options]
 
 # Using exact version combination
-docker run -v $(pwd):/workspace ragedunicorn/apktool:3.0.2-alpine3.24.1-1 [apktool-options]
+docker run -v $(pwd):/workspace ragedunicorn/apktool:<apktool-version>-alpine<alpine-version>-<build> [apktool-options]
 ```
 
 **Windows (PowerShell):**
@@ -64,8 +64,11 @@ docker run -v $(pwd):/workspace ragedunicorn/apktool:3.0.2-alpine3.24.1-1 [apkto
 docker run -v ${PWD}:/workspace ragedunicorn/apktool:latest [apktool-options]
 
 # Using specific Apktool version (latest Alpine build)
-docker run -v ${PWD}:/workspace ragedunicorn/apktool:3.0.2 [apktool-options]
+docker run -v ${PWD}:/workspace ragedunicorn/apktool:<apktool-version> [apktool-options]
 ```
+
+Available tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/apktool/tags) and in the
+[GitHub releases](https://github.com/RagedUnicorn/docker-apktool/releases).
 
 ### Examples
 
@@ -196,7 +199,7 @@ See [examples/README.md](examples/README.md) for the full list of example servic
    preferred version:
 
    ```env
-   APKTOOL_VERSION=3.0.2-alpine3.24.1-1
+   APKTOOL_VERSION=<apktool-version>-alpine<alpine-version>-<build>
    ```
 
 ## Versioning
@@ -205,9 +208,12 @@ This project uses semantic versioning that matches the Docker image contents:
 
 **Format:** `{apktool_version}-alpine{alpine_version}-{build_number}`
 
-Examples:
-- `3.0.2-alpine3.24.1-1` - Apktool 3.0.2 on Alpine 3.24.1, build 1
+Examples (`X.Y.Z` is the Apktool version, `A.B.C` the Alpine version):
+- `X.Y.Z-alpineA.B.C-1` - Apktool X.Y.Z on Alpine A.B.C, build 1
+- `X.Y.Z` - Most recent build of Apktool X.Y.Z
 - `latest` - Most recent stable release
+
+The current tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/apktool/tags).
 
 For detailed release process and versioning guidelines, see [RELEASE.md](RELEASE.md).
 
