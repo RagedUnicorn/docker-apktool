@@ -14,7 +14,7 @@
 # The image version is set in the .env file (default: latest)
 # You can override it by:
 #   - Editing the .env file
-#   - Setting environment variable: APKTOOL_VERSION=3.0.2 docker-compose run --rm apktool [args]
+#   - Setting environment variable: APKTOOL_VERSION=<apktool-version> docker-compose run --rm apktool [args]
 
 services:
   apktool:
