@@ -35,6 +35,18 @@ docker pull ragedunicorn/apktool:latest
 docker run -v $(pwd):/workspace ragedunicorn/apktool:latest d app.apk -o app
 ```
 
+On Windows, use the PowerShell form:
+
+```powershell
+# Decode an APK in the current directory
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest d app.apk -o app
+```
+
+Write `${PWD}` **with braces** and keep the colon inside the quotes - without
+braces PowerShell parses `$PWD:` as a scope-qualified variable (as in
+`$env:PATH`) and rejects the argument. See the
+[Windows (PowerShell) notes](#windows-powershell-notes) for details.
+
 For development and building the image yourself, see [DEVELOPMENT.md](DEVELOPMENT.md).
 
 ## Usage
@@ -61,10 +73,13 @@ docker run -v $(pwd):/workspace ragedunicorn/apktool:<apktool-version>-alpine<al
 
 ```powershell
 # Using latest version
-docker run -v ${PWD}:/workspace ragedunicorn/apktool:latest [apktool-options]
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest [apktool-options]
 
 # Using specific Apktool version (latest Alpine build)
-docker run -v ${PWD}:/workspace ragedunicorn/apktool:<apktool-version> [apktool-options]
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:<apktool-version> [apktool-options]
+
+# Using exact version combination
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:<apktool-version>-alpine<alpine-version>-<build> [apktool-options]
 ```
 
 Available tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/apktool/tags) and in the
@@ -76,10 +91,6 @@ Available tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicorn/
 
 ```bash
 docker run -v $(pwd):/workspace ragedunicorn/apktool:latest d app.apk -o app
-```
-
-```powershell
-docker run -v ${PWD}:/workspace ragedunicorn/apktool:latest d app.apk -o app
 ```
 
 #### Decode Resources Only (skip disassembling code)
@@ -112,6 +123,58 @@ See [Apktool's framework documentation](https://apktool.org/wiki/in-depth/framew
 docker run -e APKTOOL_JAVA_OPTS="-Xmx4G -Dfile.encoding=utf-8" \
   -v $(pwd):/workspace ragedunicorn/apktool:latest d big-app.apk -o big-app
 ```
+
+#### PowerShell
+
+The same examples in PowerShell:
+
+```powershell
+# Decode an APK
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest d app.apk -o app
+
+# Decode resources only (skip disassembling code)
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest d -s app.apk -o app
+
+# Rebuild a decoded project
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest b app -o app-rebuilt.apk
+
+# Install a framework APK into the mounted workspace
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest if framework-res.apk -p framework
+
+# Raise the JVM heap for large APKs (backtick continues the line)
+docker run -e APKTOOL_JAVA_OPTS="-Xmx4G -Dfile.encoding=utf-8" `
+  -v "${PWD}:/workspace" ragedunicorn/apktool:latest d big-app.apk -o big-app
+```
+
+### Windows (PowerShell) notes
+
+The PowerShell variants differ from the bash ones only in the mount, which is
+written `-v "${PWD}:/workspace"` instead of `-v $(pwd):/workspace`, and in the
+line continuation (a backtick instead of a backslash). The mount spelling
+matters:
+
+- Pasting the bash form into PowerShell breaks: PowerShell ends the argument
+  after the `$(pwd)` subexpression, so `$(pwd):/workspace` reaches Docker as
+  two arguments (`C:\path` and `:/workspace`) and the run fails with
+  `invalid reference format`.
+- `"$PWD:/workspace"` without braces is a parse error: PowerShell reads a
+  colon after a variable as a scope qualifier (as in `$env:PATH`), and `/` is
+  not a valid variable-name character.
+- `"${PWD}:/workspace"` works: the braces end the variable name at `PWD`, the
+  colon stays literal, and Docker splits the resulting `C:\path:/workspace`
+  on the second colon because it recognises the `C:` drive prefix.
+
+To check what the container actually sees under `/workspace`, run a
+look-inside command:
+
+```powershell
+docker run --rm -v "${PWD}:/workspace" --entrypoint sh ragedunicorn/apktool:latest -c 'pwd; ls -la /workspace'
+```
+
+The single quotes keep `pwd; ls -la /workspace` as one literal argument to
+the container's `sh`, so the `;` runs inside the container - unquoted,
+PowerShell would treat `;` as its own statement separator and run
+`ls -la /workspace` on the host.
 
 ## Architecture Support
 

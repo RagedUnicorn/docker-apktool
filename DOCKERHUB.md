@@ -18,6 +18,15 @@ docker pull ragedunicorn/apktool:<apktool-version>-alpine<alpine-version>-<build
 docker run -v $(pwd):/workspace ragedunicorn/apktool:latest d app.apk -o app
 ```
 
+On Windows, use the PowerShell form - `${PWD}` **with braces** and the colon
+inside the quotes (without braces PowerShell parses `$PWD:` as a
+scope-qualified variable, as in `$env:PATH`, and rejects the argument):
+
+```powershell
+# Decode an APK
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest d app.apk -o app
+```
+
 ## Features
 
 - 🚀 **Small footprint**: Alpine Linux base with a JRE-only Temurin 21 runtime
@@ -35,11 +44,23 @@ docker run -v $(pwd):/workspace ragedunicorn/apktool:latest \
   d app.apk -o app
 ```
 
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest d app.apk -o app
+```
+
 ### Decode resources only (skip disassembling code)
 
 ```bash
 docker run -v $(pwd):/workspace ragedunicorn/apktool:latest \
   d -s app.apk -o app
+```
+
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest d -s app.apk -o app
 ```
 
 ### Rebuild a decoded project
@@ -49,6 +70,12 @@ docker run -v $(pwd):/workspace ragedunicorn/apktool:latest \
   b app -o app-rebuilt.apk
 ```
 
+PowerShell:
+
+```powershell
+docker run -v "${PWD}:/workspace" ragedunicorn/apktool:latest b app -o app-rebuilt.apk
+```
+
 The rebuilt APK is unsigned — sign it with apksigner or a similar tool before installing it on a device.
 
 ### Raise the JVM heap for large APKs
@@ -56,6 +83,13 @@ The rebuilt APK is unsigned — sign it with apksigner or a similar tool before 
 ```bash
 docker run -e APKTOOL_JAVA_OPTS="-Xmx4G -Dfile.encoding=utf-8" \
   -v $(pwd):/workspace ragedunicorn/apktool:latest d big-app.apk -o big-app
+```
+
+PowerShell (a backtick continues the line):
+
+```powershell
+docker run -e APKTOOL_JAVA_OPTS="-Xmx4G -Dfile.encoding=utf-8" `
+  -v "${PWD}:/workspace" ragedunicorn/apktool:latest d big-app.apk -o big-app
 ```
 
 ## Tags
