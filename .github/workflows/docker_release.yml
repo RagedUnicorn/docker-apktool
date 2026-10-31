@@ -43,6 +43,42 @@ jobs:
           echo "::endgroup::"
 
           echo "::notice title=✅ Tests Passed::All Container Structure Tests completed successfully!"
+      - name: Set up QEMU
+        uses: docker/setup-qemu-action@v4
+      - name: Build arm64 test image
+        uses: docker/build-push-action@v7
+        with:
+          context: .
+          load: true
+          provenance: false
+          platforms: linux/arm64
+          tags: ragedunicorn/apktool:test-arm64
+          cache-from: type=gha
+          cache-to: type=gha,mode=max
+      - name: Smoke test arm64 image
+        run: |
+          echo "::group::Running arm64 Apktool under QEMU"
+          docker run --rm --platform linux/arm64 ragedunicorn/apktool:test-arm64 --version
+          echo "::endgroup::"
+
+          # Decode only: on arm64 `apktool b` is unsupported (upstream bundles
+          # only an x86_64 aapt2, see README Architecture Support)
+          echo "::group::Decoding the sample APK on arm64"
+          docker run --rm --platform linux/arm64 -v "$PWD/workspace/input:/input:ro" \
+            ragedunicorn/apktool:test-arm64 d /input/hello.apk -o /workspace/hello
+          echo "::endgroup::"
+
+          # An amd64 JVM in the arm64 image would still run natively on the
+          # amd64 runner, so also assert the ELF e_machine of the java launcher
+          # is aarch64 (0xb7)
+          echo "::group::Checking JVM architecture"
+          MACHINE=$(docker run --rm --platform linux/arm64 --entrypoint od ragedunicorn/apktool:test-arm64 -An -tx1 -j18 -N2 /usr/lib/jvm/java-21-temurin-jre/bin/java | tr -d ' \n')
+          echo "e_machine: $MACHINE"
+          if [ "$MACHINE" != "b700" ]; then
+            echo "::error title=❌ Wrong Architecture::java in the arm64 image is not an aarch64 binary (e_machine=$MACHINE)"
+            exit 1
+          fi
+          echo "::endgroup::"
 
   build-and-push:
     needs: test
