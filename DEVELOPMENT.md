@@ -173,6 +173,10 @@ This project uses [Renovate](https://docs.renovatebot.com/) to automatically man
   listing and creates PRs when the pinned `temurin-21-jre` apk package moves
 - **Alpine Linux**: Renovate monitors Docker Hub and creates PRs for new Alpine versions
 
+The schedule, the Alpine and harness rules and the custom managers come from the shared
+[RagedUnicorn/renovate-config](https://github.com/RagedUnicorn/renovate-config) preset; `renovate.json` holds only the
+Apktool and Temurin rules.
+
 The Alpine version is referenced in several places that must stay aligned:
 
 - The `FROM alpine:X.X.X` lines in the Dockerfile (tracked by Renovate's built-in Dockerfile manager)
