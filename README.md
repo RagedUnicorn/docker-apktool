@@ -217,6 +217,21 @@ The current tags are listed on [Docker Hub](https://hub.docker.com/r/ragedunicor
 
 For detailed release process and versioning guidelines, see [RELEASE.md](RELEASE.md).
 
+## Image Verification
+
+Released images are signed with [cosign](https://docs.sigstore.dev/) keyless signing and carry SBOM and provenance attestations.
+
+```bash
+# Verify the signature (works for both ghcr.io/ragedunicorn/docker-apktool and ragedunicorn/apktool)
+cosign verify ragedunicorn/apktool:latest \
+  --certificate-identity-regexp '^https://github.com/RagedUnicorn/docker-apktool/\.github/workflows/docker_release\.yml@refs/tags/v' \
+  --certificate-oidc-issuer https://token.actions.githubusercontent.com
+
+# Inspect the SBOM and provenance attestations
+docker buildx imagetools inspect ragedunicorn/apktool:latest --format '{{ json .SBOM }}'
+docker buildx imagetools inspect ragedunicorn/apktool:latest --format '{{ json .Provenance }}'
+```
+
 ## Automated Dependency Updates
 
 This project uses [Renovate](https://docs.renovatebot.com/) to automatically check for updates to:
