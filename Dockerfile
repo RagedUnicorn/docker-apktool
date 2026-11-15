@@ -1,7 +1,7 @@
 ############################################
 # Download + verify stage
 ############################################
-FROM alpine:3.24.3 AS build
+FROM alpine:3.24.4 AS build
 
 # renovate: datasource=github-releases depName=iBotPeaches/Apktool
 ARG APKTOOL_VERSION=3.0.3
@@ -32,7 +32,7 @@ RUN set -eux; \
 ############################################
 # Runtime stage
 ############################################
-FROM alpine:3.24.3
+FROM alpine:3.24.4
 
 # renovate: datasource=custom.adoptium-apk depName=temurin-21-jre versioning=loose
 ARG TEMURIN_VERSION=21.0.13_p9-r0
@@ -49,7 +49,7 @@ LABEL org.opencontainers.image.title="Apktool on Alpine Linux" \
       org.opencontainers.image.licenses="MIT" \
       org.opencontainers.image.version="${VERSION}" \
       org.opencontainers.image.created="${BUILD_DATE}" \
-      org.opencontainers.image.base.name="docker.io/library/alpine:3.24.3"
+      org.opencontainers.image.base.name="docker.io/library/alpine:3.24.4"
 
 # ca-certificates: TLS trust store (family convention; java-cacerts wires the
 # JVM keystore against it). The Adoptium repository key must be stored under
